@@ -65,11 +65,11 @@ func (b *Builder) cleanup() {
 // buildDir creates a temporary build directory and sets this Builder's buildDir
 // property to that directory.
 func (b *Builder) createBuildDir() error {
-  // if dry run, carry out dry run build using actual project root since no side effects
-  // will be performed
+	// if dry run, carry out dry run build using actual project root since no side effects
+	// will be performed
 	if !b.target.DryRun {
 		log.Printf("target is configured for dry run; won't create a new build directory")
-    b.buildDir = b.target.ProjectRoot
+		b.buildDir = b.target.ProjectRoot
 
 		return nil
 	}
