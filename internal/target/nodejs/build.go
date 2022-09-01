@@ -24,11 +24,19 @@ func removeUnusedImportsFromDependencyFile(imports []string, path string) error 
 func (b *Builder) discoverUsedImports() error {
 	// traverse each import found in the entrypoint file, scanning for
 	// absolute dependencies managed by node_modules
+	if !b.target.RemoveUnusedImports {
+		log.Printf("target is configured to ignore unused imports")
+		return nil
+	}
 }
 
 func (b *Builder) removeUnusedImports() error {
 	if !b.target.DryRun {
 		log.Printf("target is configured for dry run; won't remove unused imports")
+		return nil
+	}
+	if !b.target.RemoveUnusedImports {
+		log.Printf("target is configured to ignore unused imports")
 		return nil
 	}
 	if b.target.IgnoreLockFile {
@@ -78,7 +86,6 @@ func (b *Builder) createBuildDir() error {
 	if err != nil {
 		return err
 	}
-
 	b.buildDir = dir
 
 	return nil
@@ -89,9 +96,7 @@ func (b *Builder) Build() error {
 
 	err := b.createBuildDir()
 	err = b.copyBuildFiles()
-	if b.target.RemoveUnusedImports {
-		err = b.discoverUsedImports()
-		err = b.removeUnusedImports()
-	}
+	err = b.discoverUsedImports()
+	err = b.removeUnusedImports()
 	err = b.createBuildArtifact()
 }
