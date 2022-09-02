@@ -135,24 +135,21 @@ func (b *Builder) Build() error {
 	logger := log.FromContext(b.ctx)
 	logger.Info().Bool("dry_run", b.target.DryRun).Msg("building")
 
-	var err error
-	if err = b.createBuildDir(); err != nil {
-		return err
+	pipeline := []func() error{
+		b.createBuildDir,
+		b.copyBuildFiles,
+		b.discoverUsedImports,
+		b.removeUnusedImports,
+		b.createBuildArtifact,
 	}
-	if err = b.copyBuildFiles(); err != nil {
-		return err
-	}
-	if err = b.discoverUsedImports(); err != nil {
-		return err
-	}
-	if err = b.removeUnusedImports(); err != nil {
-		return err
-	}
-	if err = b.createBuildArtifact(); err != nil {
-		return err
+
+	for _, step := range pipeline {
+		err := step()
+		if err != nil {
+			return err
+		}
 	}
 
 	logger.Warn().Msg("not implemented")
-
-	return err
+	return nil
 }
