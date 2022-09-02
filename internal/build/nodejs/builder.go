@@ -8,8 +8,10 @@ import (
 )
 
 type Builder struct {
+	entry              string
+	dryRun             bool
+	opts               *Options
 	ctx                context.Context
-	target             *Target
 	buildDir           string
 	usedImports        []string
 	dependencyFilePath string
@@ -39,8 +41,8 @@ func (b *Builder) discoverUsedImports() error {
 	// absolute dependencies managed by node_modules
 	logger := log.FromContext(b.ctx)
 
-	if !b.target.RemoveUnusedImports {
-		logger.Info().Msg("target is configured to ignore unused imports")
+	if !b.opts.RemoveUnusedImports {
+		logger.Info().Msg("opts is configured to ignore unused imports")
 		return nil
 	}
 
@@ -52,17 +54,17 @@ func (b *Builder) discoverUsedImports() error {
 func (b *Builder) removeUnusedImports() error {
 	logger := log.FromContext(b.ctx)
 
-	if !b.target.DryRun {
-		logger.Info().Msg("target is configured for dry run; won't remove unused imports")
+	if !b.dryRun {
+		logger.Info().Msg("opts is configured for dry run; won't remove unused imports")
 		return nil
 	}
 
-	if !b.target.RemoveUnusedImports {
-		logger.Info().Msg("target is configured to ignore unused imports")
+	if !b.opts.RemoveUnusedImports {
+		logger.Info().Msg("opts is configured to ignore unused imports")
 		return nil
 	}
 
-	if b.target.IgnoreLockFile {
+	if b.opts.IgnoreLockFile {
 		return b.removeUnusedImportsFromDependencyFile()
 	}
 
@@ -73,8 +75,8 @@ func (b *Builder) removeUnusedImports() error {
 func (b *Builder) copyBuildFiles() error {
 	logger := log.FromContext(b.ctx)
 
-	if !b.target.DryRun {
-		logger.Info().Msg("target is configured for dry run; won't copy build files")
+	if !b.dryRun {
+		logger.Info().Msg("opts is configured for dry run; won't copy build files")
 		return nil
 	}
 
@@ -87,8 +89,8 @@ func (b *Builder) copyBuildFiles() error {
 func (b *Builder) createBuildArtifact() error {
 	logger := log.FromContext(b.ctx)
 
-	if !b.target.DryRun {
-		logger.Info().Msg("target is configured for dry run; won't create a build artifact")
+	if !b.dryRun {
+		logger.Info().Msg("opts is configured for dry run; won't create a build artifact")
 		return nil
 	}
 
@@ -102,7 +104,7 @@ func (b *Builder) createBuildArtifact() error {
 func (b *Builder) cleanup() {
 	logger := log.FromContext(b.ctx)
 
-	if !b.target.DryRun {
+	if !b.dryRun {
 		logger.Info().Msg("target is configured for dry run; nothing to cleanup")
 	}
 }
@@ -113,9 +115,9 @@ func (b *Builder) createBuildDir() error {
 	logger := log.FromContext(b.ctx)
 	// if dry run, carry out dry run build using actual project root since no side effects
 	// will be performed
-	if !b.target.DryRun {
+	if !b.dryRun {
 		logger.Info().Msg("target is configured for dry run; won't create a new build directory")
-		b.buildDir = b.target.ProjectRoot
+		b.buildDir = b.opts.ProjectRoot
 
 		return nil
 	}
@@ -133,7 +135,7 @@ func (b *Builder) Build() error {
 	defer b.cleanup()
 
 	logger := log.FromContext(b.ctx)
-	logger.Info().Bool("dry_run", b.target.DryRun).Msg("building")
+	logger.Info().Bool("dry_run", b.dryRun).Msg("building")
 
 	pipeline := []func() error{
 		b.createBuildDir,

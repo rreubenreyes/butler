@@ -9,9 +9,21 @@ import (
 
 type logger struct{}
 
+var wr = &zerolog.ConsoleWriter{
+	Out:        os.Stdout,
+	PartsOrder: []string{"time", "level", "message"},
+}
+
 // ForContext copies the provided context and adds a *zerolog.Logger.
 func ForContext(ctx context.Context) context.Context {
-	l := zerolog.New(os.Stdout)
+	l := zerolog.New(wr).With().Timestamp().Logger()
+
+	return context.WithValue(ctx, logger{}, &l)
+}
+
+// ForContext copies the provided context and adds a *zerolog.Logger.
+func ForContextWith(ctx context.Context, key string, value string) context.Context {
+	l := zerolog.New(wr).With().Timestamp().Str(key, value).Logger()
 
 	return context.WithValue(ctx, logger{}, &l)
 }
@@ -22,7 +34,7 @@ func FromContext(ctx context.Context) *zerolog.Logger {
 		return l
 	}
 
-	l := zerolog.New(os.Stdout)
+	l := zerolog.New(wr).With().Timestamp().Logger()
 
 	return &l
 }

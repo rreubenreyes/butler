@@ -7,13 +7,7 @@ import (
 )
 
 // Target defines a deployment artifact build target.
-type Target struct {
-	// Entry is an absolute path to the serverless function's entrypoint file.
-	//
-	// An "entrypoint file" is defined as the code which is directly imported and/or executed
-	// at runtime by the host machine.
-	Entry string `json:"entry"`
-
+type Options struct {
 	// ProjectRoot is an _optional_ absolute path to  the project root to be used
 	// when building the serverless function defined by this Target. If not specified,
 	// then we attempt to detect the project root at build time.
@@ -38,19 +32,18 @@ type Target struct {
 	// PreserveFileStructure is a flag which defines whether or not to preserve the source
 	// file structure when creating the build artifact.
 	PreserveFileStructure bool `json:"preserve_file_structure"`
-
-	// BuildArtifactType defines what build artifact should be expected from this build.
-	BuildArtifactType string `json:"build_artifact_type"`
-
-	// DryRun is a flag which determines whether or not to execute side effects.
-	DryRun bool `json:"dry_run"`
 }
 
-func (t *Target) Build() error {
+func Build(entry string, dryRun bool, opts *Options) error {
 	ctx := log.ForContext(context.Background())
 	logger := log.FromContext(ctx)
 
-	b := &Builder{ctx: ctx, target: t}
+	b := &Builder{
+		ctx:    ctx,
+		entry:  entry,
+		dryRun: dryRun,
+		opts:   opts,
+	}
 
 	err := b.Build()
 	if err != nil {
