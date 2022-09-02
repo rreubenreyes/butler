@@ -48,7 +48,20 @@ type Target struct {
 
 func (t *Target) Build() error {
 	ctx := log.ForContext(context.Background())
+	logger := log.FromContext(ctx)
 
 	b := &Builder{ctx: ctx, target: t}
-	b.Build()
+
+	err := b.Build()
+	if err != nil {
+		logger.Error().
+			Str("err", err.Error()).
+			Msg("error building")
+
+		return err
+	}
+
+	logger.Info().Msg("finished building")
+
+	return nil
 }
