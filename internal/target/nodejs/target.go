@@ -49,6 +49,6 @@ type Target struct {
 func (t *Target) Build() error {
 	ctx := log.ForContext(context.Background())
 
-  b := &Builder{ctx: ctx, target: t}
+	b := &Builder{ctx: ctx, target: t}
 	b.Build()
 }
