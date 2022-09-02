@@ -1,5 +1,11 @@
 package nodejs
 
+import (
+	"context"
+
+	"github.com/rreubenreyes/butler/internal/log"
+)
+
 // Target defines a deployment artifact build target.
 type Target struct {
 	// Entry is an absolute path to the serverless function's entrypoint file.
@@ -29,6 +35,10 @@ type Target struct {
 	// be used to install modules.
 	IgnoreLockFile bool `json:"ignore_lock_file"`
 
+	// PreserveFileStructure is a flag which defines whether or not to preserve the source
+	// file structure when creating the build artifact.
+	PreserveFileStructure bool `json:"preserve_file_structure"`
+
 	// BuildArtifactType defines what build artifact should be expected from this build.
 	BuildArtifactType string `json:"build_artifact_type"`
 
@@ -36,11 +46,9 @@ type Target struct {
 	DryRun bool `json:"dry_run"`
 }
 
-func discoverProjectRoot() error {
-	// TODO: implement
-}
-
 func (t *Target) Build() error {
-	b := &Builder{target: t}
+	ctx := log.ForContext(context.Background())
+
+  b := &Builder{ctx: ctx, target: t}
 	b.Build()
 }
