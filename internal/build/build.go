@@ -35,8 +35,7 @@ type Target struct {
 }
 
 func Build(ctx context.Context, t *Target) error {
-	ctx = log.ForContext(ctx)
-	logger := log.FromContext(ctx)
+	_, logger := log.ForContext(ctx)
 	logger.Trace().Msg("starting top-level build")
 
 	return nil

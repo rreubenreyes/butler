@@ -34,8 +34,7 @@ var cmdBuildNodeJS = &cobra.Command{
 	Long:  "Build a NodeJS serverless function",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := log.ForContextWith(context.Background(), "cmd", "build/nodejs")
-		logger := log.FromContext(ctx)
+		_, logger := log.ForContextWith(context.Background(), "cmd", "build/nodejs")
 		logger.Trace().Msg("starting nodejs command")
 
 		target.Entry = args[0]

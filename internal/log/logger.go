@@ -15,17 +15,17 @@ var wr = &zerolog.ConsoleWriter{
 }
 
 // ForContext copies the provided context and adds a *zerolog.Logger.
-func ForContext(ctx context.Context) context.Context {
+func ForContext(ctx context.Context) (context.Context, *zerolog.Logger) {
 	l := zerolog.New(wr).With().Timestamp().Logger()
 
-	return context.WithValue(ctx, logger{}, &l)
+	return context.WithValue(ctx, logger{}, &l), &l
 }
 
 // ForContext copies the provided context and adds a *zerolog.Logger.
-func ForContextWith(ctx context.Context, key string, value string) context.Context {
+func ForContextWith(ctx context.Context, key string, value string) (context.Context, *zerolog.Logger) {
 	l := zerolog.New(wr).With().Timestamp().Str(key, value).Logger()
 
-	return context.WithValue(ctx, logger{}, &l)
+	return context.WithValue(ctx, logger{}, &l), &l
 }
 
 // FromContext gets a *zerolog.Logger from the provided context object.

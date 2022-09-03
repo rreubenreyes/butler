@@ -35,8 +35,7 @@ type Options struct {
 }
 
 func Build(entry string, dryRun bool, opts *Options) error {
-	ctx := log.ForContext(context.Background())
-	logger := log.FromContext(ctx)
+	ctx, logger := log.ForContext(context.Background())
 
 	b := &Builder{
 		ctx:    ctx,
