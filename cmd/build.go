@@ -41,6 +41,7 @@ var cmdBuildNodeJS = &cobra.Command{
 		logger.Trace().Msg("starting nodejs command")
 
 		target.Entry = args[0]
+		target.Runtime = "nodejs"
 		t, _ := json.Marshal(target)
 
 		logger.Debug().RawJSON("target", t).Msg("binding build arguments")

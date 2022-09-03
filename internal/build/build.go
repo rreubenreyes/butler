@@ -24,14 +24,14 @@ type Target struct {
 	// DryRun is a flag which determines whether or not to execute side effects.
 	DryRun bool `json:"dry_run"`
 
-	// BuildArtifactType defines what build artifact should be expected from this build.
-	BuildArtifactType string `json:"build_artifact_type"`
-
 	// Runtime defines the runtime which will be used for this build.
 	Runtime Runtime `json:"runtime"`
 
 	// NodeJS defines the set of parameters which are accepted by a NodeJS build target.
 	NodeJS nodejs.Options
+
+	// BuildArtifactType determines type of output package of the generated build artifact.
+	BuildArtifactType string
 }
 
 func Build(ctx context.Context, t *Target) error {
