@@ -21,8 +21,6 @@ var cmdBuild = &cobra.Command{
 }
 
 func initCmdBuild() {
-	cmdBuildNodeJS.PersistentFlags().
-		StringVarP(&target.BuildArtifactType, "build-artifact-type", "t", "", "the type of build artifact to generate")
 	cmdBuild.PersistentFlags().
 		BoolVar(&target.DryRun, "dry-run", false, "if set, no build side effects will occur")
 
@@ -50,6 +48,8 @@ var cmdBuildNodeJS = &cobra.Command{
 
 func initCmdBuildNodeJS() {
 	cmdBuildNodeJS.Flags().
+		StringVarP(&target.BuildArtifactType, "build-artifact-type", "t", "", "the type of build artifact to generate")
+	cmdBuildNodeJS.Flags().
 		StringVarP(&target.NodeJS.ProjectRoot, "project-root", "r", "", "location of project root")
 	cmdBuildNodeJS.Flags().
 		BoolVar(&target.NodeJS.RemoveUnusedImports, "remove-unused-imports", true, "if set, removes unused imports from build artifact")
@@ -60,5 +60,6 @@ func initCmdBuildNodeJS() {
 	cmdBuildNodeJS.Flags().
 		StringSliceVar(&target.NodeJS.AdditionalFiles, "additional-files", []string{}, "if set, removes unused imports from build artifact")
 
+	cmdBuildNodeJS.MarkFlagRequired("build-artifact-type")
 	cmdBuild.AddCommand(cmdBuildNodeJS)
 }

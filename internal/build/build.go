@@ -27,11 +27,11 @@ type Target struct {
 	// Runtime defines the runtime which will be used for this build.
 	Runtime Runtime `json:"runtime"`
 
-	// NodeJS defines the set of parameters which are accepted by a NodeJS build target.
-	NodeJS nodejs.Options
-
 	// BuildArtifactType determines type of output package of the generated build artifact.
-	BuildArtifactType string
+	BuildArtifactType string `json:"build_artifact_type"`
+
+	// NodeJS defines the set of parameters which are accepted by a NodeJS build target.
+	NodeJS nodejs.Options `json:"node_js"`
 }
 
 func Build(ctx context.Context, t *Target) error {
