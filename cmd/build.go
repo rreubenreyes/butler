@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/rreubenreyes/butler/internal/build"
 	"github.com/rreubenreyes/butler/internal/log"
@@ -10,6 +11,7 @@ import (
 )
 
 // base build command
+var buildManifestPath string
 var target = &build.Target{}
 
 var cmdBuild = &cobra.Command{
@@ -23,8 +25,10 @@ var cmdBuild = &cobra.Command{
 func initCmdBuild() {
 	cmdBuild.PersistentFlags().
 		BoolVar(&target.DryRun, "dry-run", false, "if set, no build side effects will occur")
+	cmdBuild.PersistentFlags().
+		StringVarP(&buildManifestPath, "manifest", "m", "", "path to manifest file")
 
-	cmdBuild.MarkFlagRequired("build-artifact-type")
+	// cmdBuild.MarkFlagRequired("build-artifact-type")
 	rootCmd.AddCommand(cmdBuild)
 }
 
@@ -34,14 +38,23 @@ var cmdBuildNodeJS = &cobra.Command{
 	Long:  "Build a NodeJS serverless function",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		_, logger := log.ForContextWith(context.Background(), "cmd", "build/nodejs")
+		ctx, logger := log.ForContextWith(context.Background(), "cmd", "build/nodejs")
 		logger.Trace().Msg("starting nodejs command")
 
-		target.Entry = args[0]
-		target.Runtime = "nodejs"
+		if buildManifestPath != "" {
+			// TODO: might have to resolve absolute path from manifest here
+			target = build.MustBindTargetFromManifest(ctx, buildManifestPath)
+			if target.Runtime != "nodejs" {
+				panic(errors.New("invalid nodejs manifest"))
+			}
+		} else {
+			target.Entry = args[0]
+			target.Runtime = "nodejs"
+		}
+
 		t, _ := json.Marshal(target)
 
-		logger.Debug().RawJSON("target", t).Msg("binding build arguments")
+		logger.Debug().RawJSON("target", t).Msg("bound build arguments")
 	},
 }
 
